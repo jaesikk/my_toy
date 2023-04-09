@@ -46,9 +46,17 @@ def search_ticket():
     print('달력 조회를 시작합니다.')
 
     # test2 - success
-    td_date = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{2}]/td[{7}]/input[1]')
-    print('XPATH: ', td_date.get_attribute("class_"))
+    td_date = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[3]/td[7]/input[1]')
+    print('XPATH: ', td_date.get_attribute("class"))
     print('XPATH: ', td_date.get_attribute("value"))
+
+    btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[3]/td[7]/a')
+    btn.click()
+
+    # 시간 조회까지 성공, 여기도 포문 돌려야함
+    td_time = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[1]')
+    print('td_time.clss : ',td_time.get_attribute("class"))
+    print('td_time.value : ',td_time.get_attribute("value"))
 
 
     ''' test2 for문 돌리려고 변수화하다가 실패
@@ -165,7 +173,7 @@ if __name__ == "__main__":
     # browser = webdriver.Chrome(options=options)
     browser = webdriver.Chrome()
     driver = open_browser()
-    driver = login(driver, 'ID', 'PW')
+    driver = login(driver, 'js1231', 'a1s2d3f4g5')
 
     search_ticket()
     time.sleep(10)
