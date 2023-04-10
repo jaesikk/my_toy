@@ -4,6 +4,7 @@
 '''
 
 import time
+import telegram
 from random import randint
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -83,11 +84,11 @@ def click_refresh():
 
 def search_time():
     global date_cnt
-    time.sleep(0.1)
+    time.sleep(0.3)
     for i in range(1,5):
         # test : 시간 무조건 오후거만 본다는 전제
         time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
-        time.sleep(0.3) # 런타임 에러 주포인트 2
+        time.sleep(0.2) # 런타임 에러 주포인트 2 #
         left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
         driver.implicitly_wait(10)
         left = left_tickets.get_attribute("value")
@@ -126,6 +127,7 @@ def search_date():
     # tmp_btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[3]/td[7]/a')
     time.sleep(0.5) # 런타임 에러 주포인트 1
     for week in range(1,7):
+        time.sleep(0.3) # 1만 출력됏을때도중에 끊겼을때
         for day in range(1,8):
             td_class = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]')
             driver.implicitly_wait(10)
@@ -134,7 +136,9 @@ def search_date():
                 driver.implicitly_wait(10)
                 date_val = td_date.get_attribute("value")
                 driver.implicitly_wait(5)
+                print('1')
                 if date_val in date_list: # 내가 조회하고 싶은 날
+                    print('2')
                     btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/a')
                     btn.click()
                     print('select_date::', date_val, ' || date_lst::', date_list)
@@ -152,3 +156,5 @@ if __name__ == "__main__":
     select_exhibit(exhibit)
 
     search_date()
+    bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
+    bot.send_message(chat_id=-721609842, text="야 니 븅신 매크로 멈췄다ㅋㅋ")
