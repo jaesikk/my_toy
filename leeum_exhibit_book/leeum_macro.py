@@ -23,7 +23,7 @@ load_dotenv()
 ####################### input value ###########################
 id = os.environ.get("ID") #리움미술관 ID
 pw = os.environ.get("PW") #리움미술관 PW
-date_list = ['20230415','20230422'] #원하는 일자
+date_list = ['20230413','20230415','20230416','20230422','20230423'] #원하는 일자
 exhibit = 2 #원하는 전시회 (n번째)
 ###############################################################
 
@@ -77,20 +77,20 @@ def click_refresh():
 
     refresh_btn = driver.find_element(By.XPATH, '//*[@id="step0"]/div/div/div[1]/ul[1]/li/button')
     refresh_btn.click()
-    time.sleep(randint(2, 4)) #2~4초 랜덤으로 기다리기
+    time.sleep(randint(3, 5)) #3~5초 랜덤으로 기다리기
     refresh_cnt += 1
     print('재검색에 돌입합니다.')
     search_date()
 
 def search_time():
     global date_cnt
-    time.sleep(0.3)
+    time.sleep(0.2)
     for i in range(1,5):
         # test : 시간 무조건 오후거만 본다는 전제
         time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
-        time.sleep(0.2) # 런타임 에러 주포인트 2 #
+        time.sleep(0.1) # 런타임 에러 주포인트 2 #
         left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
-        driver.implicitly_wait(10)
+        time.sleep(0.1) # 여기를 추가해줬다. 런타임 주포인트 3
         left = left_tickets.get_attribute("value")
         driver.implicitly_wait(10)
         if int(left) > 1:
@@ -127,7 +127,7 @@ def search_date():
     # tmp_btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[3]/td[7]/a')
     time.sleep(0.5) # 런타임 에러 주포인트 1
     for week in range(1,7):
-        time.sleep(0.3) # 1만 출력됏을때도중에 끊겼을때
+        time.sleep(0.1) # 1만 출력됏을때도중에 끊겼을때
         for day in range(1,8):
             td_class = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]')
             driver.implicitly_wait(10)
@@ -141,6 +141,7 @@ def search_date():
                     print('2')
                     btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/a')
                     btn.click()
+                    time.sleep(0.3)
                     print('select_date::', date_val, ' || date_lst::', date_list)
                     search_time()
     return driver
