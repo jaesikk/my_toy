@@ -10,6 +10,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 import os
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support import expected_conditions as EC
 load_dotenv()
 
 '''
@@ -87,9 +90,16 @@ def search_time():
     for i in range(1,5):
         # test : 시간 무조건 오후거만 본다는 전제 (변경 원할 시 for문 range만 수정)
         time.sleep(0.2) # 런타임 에러 주포인트 2
-        time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
+        time_btn = wait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a'))
+        )
+        # time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
         time.sleep(0.2) # 런타임 에러 주포인트 3
-        left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
+
+        left_tickets = wait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input'))
+        )
+        # left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
         left = left_tickets.get_attribute("value")
         driver.implicitly_wait(10)
         if int(left) > 1:
@@ -123,14 +133,28 @@ def search_date():
     # 달력 일자 선택
     print(f'----- {refresh_cnt}회차 조회를 시작합니다. -----')
 
-    time.sleep(0.6) # 런타임 에러 주포인트 1
+    # time.sleep(1) # 런타임 에러 주포인트 1
     for week in range(1,7):
         # time.sleep(0.1)
         for day in range(1,8):
+            # time.sleep(0.1)
+            # print('0--------------------------00')
+            # td_class = wait(driver, 5).until(
+            #     EC.presence_of_element_located((By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]'))
+            # )
+            # td_class = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]')
+
+            test = driver.find_element(By.CLASS_NAME, 'select_day')
+            print('-0---find_element_by_class_name :: ', test)
             time.sleep(0.1)
-            td_class = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]')
-            if td_class.get_attribute("class") == 'select_day': # 활성화된 날 체크
-                time.sleep(0.1)
+            # if td_class.get_attribute("class") == 'select_day': # 활성화된 날 체크
+            if test:
+                print(test.text)
+                print(test.get_attribute("value"))
+                print('----------------------------')
+                # td_date = wait(driver, 5).until(
+                #     EC.presence_of_element_located((By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/input[1]'))
+                # )
                 td_date = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/input[1]')
                 driver.implicitly_wait(10)
                 date_val = td_date.get_attribute("value")
@@ -147,12 +171,13 @@ def search_date():
 
 if __name__ == "__main__":
     options = webdriver.ChromeOptions()
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    # browser = webdriver.Chrome(options=options)
+    options.headless = True
+    caps = DesiredCapabilities().CHROME
+    caps["pageLoadStrategy"] = "none"
 
     browser = webdriver.Chrome()
-    driver = open_browser()
-    driver = login(driver, id, pw)
+    # driver = open_browser()
+    driver = login(browser, id, pw)
     select_exhibit(exhibit)
 
     search_date()
