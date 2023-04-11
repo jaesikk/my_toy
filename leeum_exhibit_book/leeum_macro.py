@@ -21,9 +21,9 @@ load_dotenv()
 +) 조회는 오후타임대만 합니다.
 '''
 ####################### input value ###########################
-id = os.environ.get("ID") #리움미술관 ID
-pw = os.environ.get("PW") #리움미술관 PW
-date_list = ['20230415','20230422'] #원하는 일자
+id = os.environ.get("ID3") #리움미술관 ID
+pw = os.environ.get("PW3") #리움미술관 PW
+date_list = ['20230419','20230420','20230421'] #원하는 일자
 exhibit = 2 #원하는 전시회 (n번째)
 ###############################################################
 
@@ -48,11 +48,25 @@ def select_exhibit(n):
     driver.find_element(By.XPATH, f'//*[@id="exhlist_item_{n-1}"]').click()
     driver.find_element(By.XPATH, '//*[@id="container"]/div[2]/a').click()
     driver.implicitly_wait(5)
+
 def final_confirm():
     time.sleep(0.2)
     confrim_btn = driver.find_element(By.XPATH,'//*[@id="payConfirm"]')
     confrim_btn.click()
     print("예약이 확정되었습니다.")
+
+    # 문자전송
+    time.sleep(1)
+    close_btn = driver.find_element(By.XPATH,'//*[@id="first_Giude"]/div/div/div[3]/button')
+    close_btn.click()
+    time.sleep(1)
+    sms_btn = driver.find_element(By.XPATH,'//*[@id="container"]/div/div/div[2]/ul/li[2]/a')
+    sms_btn.click()
+    time.sleep(1)
+    send_btn = driver.find_element(By.XPATH,'//*[@id="m_2"]/div/div/div[3]/button[2]')
+    send_btn.click()
+    print('문자 전송 완료')
+    driver.quit()
     return 1
 
 def select_ticket(n):# 일반으로만 끊습니다. 조건 더 열기 귀찮,,
@@ -97,7 +111,7 @@ def search_time():
             driver.implicitly_wait(10)
             if select_ticket(2):
                 print('=========final step2')
-                driver.implicitly_wait(10)
+                time.sleep(0.1)
                 next_btn = driver.find_element(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[3]/div[2]/div[2]/a')
                 next_btn.click()
                 final_confirm()
@@ -106,9 +120,10 @@ def search_time():
             if select_ticket(1):
                 print('=========final step1')
                 driver.implicitly_wait(10)
-                next_btn = driver.find_element(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[3]/div[2]/div[2]/a')
-                next_btn.click()
-                final_confirm()
+                driver.quit()
+                # next_btn = driver.find_element(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[3]/div[2]/div[2]/a')
+                # next_btn.click()
+                # final_confirm()
         elif int(left) == 0: # 리프레쉬 포인트
             date_cnt += 1
             print('잔여표::', left, '  //refresh까지:: ', date_cnt, ' :: ', (len(date_list)*4))

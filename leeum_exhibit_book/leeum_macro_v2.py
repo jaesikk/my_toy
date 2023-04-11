@@ -24,10 +24,11 @@ load_dotenv()
 +) 조회는 오후타임대만 합니다.
 '''
 ####################### input value ###########################
-id = os.environ.get("ID") #리움미술관 ID
-pw = os.environ.get("PW") #리움미술관 PW
-date_list = ['20230415','20230422'] #원하는 일자
-exhibit = 2 #원하는 전시회 (n번째)
+id = os.environ.get("ID2") #리움미술관 ID
+pw = os.environ.get("PW2") #리움미술관 PW
+date_list = ['15','22'] #원하는 일자
+time_list = ['14','15','16','17']
+exhibit = 1 #원하는 전시회 (n번째)
 ###############################################################
 
 date_cnt = 0
@@ -51,11 +52,25 @@ def select_exhibit(n):
     driver.find_element(By.XPATH, f'//*[@id="exhlist_item_{n-1}"]').click()
     driver.find_element(By.XPATH, '//*[@id="container"]/div[2]/a').click()
     driver.implicitly_wait(5)
+
 def final_confirm():
-    time.sleep(0.2)
+    time.sleep(0.1)
     confrim_btn = driver.find_element(By.XPATH,'//*[@id="payConfirm"]')
     confrim_btn.click()
     print("예약이 확정되었습니다.")
+
+    # 문자전송
+    time.sleep(1)
+    close_btn = driver.find_element(By.XPATH,'//*[@id="first_Giude"]/div/div/div[3]/button')
+    close_btn.click()
+    time.sleep(1)
+    sms_btn = driver.find_element(By.XPATH,'//*[@id="container"]/div/div/div[2]/ul/li[2]/a')
+    sms_btn.click()
+    time.sleep(1)
+    send_btn = driver.find_element(By.XPATH,'//*[@id="m_2"]/div/div/div[3]/button[2]')
+    send_btn.click()
+    print('문자전송완료')
+    driver.quit()
     return 1
 
 def select_ticket(n):# 일반으로만 끊습니다. 조건 더 열기 귀찮,,
@@ -85,21 +100,42 @@ def click_refresh():
 
 def search_time():
     global date_cnt
+
+    ########################################################
+    driver.implicitly_wait(10)
+    times = driver.find_elements(By.CLASS_NAME, 'select_time')
+    for t in times:
+        time.sleep(0.1)
+        # print(t.text)
+        if '예약 가능' in t.text:
+            # print('11====>',t.text)
+            for wt in time_list:
+                if wt in t.text:
+                    print('---->',wt)
+                    t.click()
+
+    times.clear()
+    print('times:: ',times)
+    ########################################################
+    '''
     time.sleep(0.1)
     print('2')
     for i in range(1,5):
         # test : 시간 무조건 오후거만 본다는 전제 (변경 원할 시 for문 range만 수정)
-        time.sleep(0.2) # 런타임 에러 주포인트 2
-        time_btn = wait(driver, 5).until(
-            EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a'))
-        )
-        # time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
-        time.sleep(0.2) # 런타임 에러 주포인트 3
+        time.sleep(0.1) # 런타임 에러 주포인트 2
+        # time_btn = wait(driver, 5).until(
+        #     EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a'))
+        # )
+        time_btn = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a')
+        print('here')
+        time.sleep(0.1) # 런타임 에러 주포인트 3
 
-        left_tickets = wait(driver, 5).until(
-            EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input'))
-        )
-        # left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
+        # left_tickets = wait(driver, 5).until(
+        #     EC.presence_of_element_located((By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input'))
+        # )
+        left_tickets = driver.find_element(By.XPATH, f'//*[@id="time_body2"]/ul[2]/li[{i}]/a/input')
+        print('this')
+        time.sleep(0.1)
         left = left_tickets.get_attribute("value")
         driver.implicitly_wait(10)
         if int(left) > 1:
@@ -107,7 +143,7 @@ def search_time():
             driver.implicitly_wait(10)
             if select_ticket(2):
                 print('=========final step2')
-                driver.implicitly_wait(10)
+                time.sleep(0.1)
                 next_btn = driver.find_element(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[3]/div[2]/div[2]/a')
                 next_btn.click()
                 final_confirm()
@@ -115,7 +151,7 @@ def search_time():
             time_btn.click()
             if select_ticket(1):
                 print('=========final step1')
-                driver.implicitly_wait(10)
+                time.sleep(0.1)
                 next_btn = driver.find_element(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[3]/div[2]/div[2]/a')
                 next_btn.click()
                 final_confirm()
@@ -126,6 +162,7 @@ def search_time():
     if date_cnt == (len(date_list)*4):
         date_cnt = 0
         click_refresh()
+    '''
 
 
 def search_date():
@@ -133,40 +170,14 @@ def search_date():
     # 달력 일자 선택
     print(f'----- {refresh_cnt}회차 조회를 시작합니다. -----')
 
-    # time.sleep(1) # 런타임 에러 주포인트 1
-    for week in range(1,7):
-        # time.sleep(0.1)
-        for day in range(1,8):
-            # time.sleep(0.1)
-            # print('0--------------------------00')
-            # td_class = wait(driver, 5).until(
-            #     EC.presence_of_element_located((By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]'))
-            # )
-            # td_class = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]')
-
-            test = driver.find_element(By.CLASS_NAME, 'select_day')
-            print('-0---find_element_by_class_name :: ', test)
-            time.sleep(0.1)
-            # if td_class.get_attribute("class") == 'select_day': # 활성화된 날 체크
-            if test:
-                print(test.text)
-                print(test.get_attribute("value"))
-                print('----------------------------')
-                # td_date = wait(driver, 5).until(
-                #     EC.presence_of_element_located((By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/input[1]'))
-                # )
-                td_date = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/input[1]')
-                driver.implicitly_wait(10)
-                date_val = td_date.get_attribute("value")
-                driver.implicitly_wait(5)
-                print('1')
-                time.sleep(0.1)
-                if date_val in date_list:
-                    btn = driver.find_element(By.XPATH, f'//*[@id="calendar_body"]/tr[{week}]/td[{day}]/a')
-                    btn.click()
-                    time.sleep(0.2)
-                    print('select_date::', date_val, ' || date_lst::', date_list)
-                    search_time()
+    days = driver.find_elements(By.CLASS_NAME, 'select_day')
+    for day in days:
+        date = day.text
+        if date in date_list:
+            day.click()
+            print('date clicked!! :: ', date)
+            time.sleep(0.5)
+            search_time()
     return driver
 
 if __name__ == "__main__":
