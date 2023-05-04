@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # browser = webdriver.Chrome(options=options)
 
     browser = webdriver.Chrome()
-    driver = open_browser()
+    # driver = open_browser()
     driver = login(driver, id, pw)
     select_exhibit(exhibit)
 

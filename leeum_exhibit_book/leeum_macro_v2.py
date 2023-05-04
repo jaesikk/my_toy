@@ -26,9 +26,10 @@ load_dotenv()
 ####################### input value ###########################
 id = os.environ.get("ID") #리움미술관 ID
 pw = os.environ.get("PW") #리움미술관 PW
-date_list = ['15','22'] #원하는 일자
-time_list = ['14','15','16','17']
+date_list = ['6','14'] #원하는 일자
+time_list = ['10','11','13','16','17']
 exhibit = 2 #원하는 전시회 (n번째)
+n_month = False # 다음달 조회여부
 ###############################################################
 
 date_cnt = 0
@@ -91,7 +92,7 @@ def search_time():
     times = driver.find_elements(By.CLASS_NAME, 'select_time')
     for idx in range(len(times)):
 
-        print('idx::',idx+1, times[idx].text)
+        # print('idx::',idx+1, times[idx].text)
         for wt in time_list:
             if wt in times[idx].text:
                 # print('wishTime:: ', wt)
@@ -110,11 +111,15 @@ def search_time():
                     times[idx].click()
                     print(wt, '시 클릭 완료')
                     # time.sleep(3)
-                    if n > 1: # 2매
+                    if n > 2: # 3
+                        print('>>>>> 3매 예약')
+                        ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[4]')
+                    elif n > 1: # 2매
                         print('>> 2매 예약')
                         ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[3]')
                     else: # 1매
-                        print('>> 1매 예약')
+                        # print('>> 1매는 필요 없어')
+                        # click_refresh()
                         ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[2]')
                     ticket.click()
                     print('인원 선택 완료')
@@ -127,7 +132,6 @@ def search_time():
     times.clear()
     # 예약은 가능하나, wishTime 포문 다 돌아도 없으면
     date_cnt += 1
-    print('---------------------------semiTmp')
     if date_cnt == len(date_list):
         print('===================refreshPoint')
         date_cnt = 0
@@ -136,17 +140,25 @@ def search_time():
 
 
 def search_date():
-    global refresh_cnt
+    global refresh_cnt, n_month
     # 달력 일자 선택
+    if n_month:
+        nm_btn = driver.find_element(By.ID, 'calendar_nextBtn')
+        nm_btn.click()
+        print('@ @ @@ @   next month btn is clicked!!')
+        time.sleep(0.5)
+        n_month = False
+
     print(f'----- {refresh_cnt}회차 조회를 시작합니다. -----')
 
     days = driver.find_elements(By.CLASS_NAME, 'select_day')
+    time.sleep(0.2)
     for day in days:
         date = day.text
         if date in date_list:
             day.click()
             print(date,'일 선택 완료! 시간 조회 시작')
-            time.sleep(0.5)
+            time.sleep(0.3)
             search_time()
     return driver
 
