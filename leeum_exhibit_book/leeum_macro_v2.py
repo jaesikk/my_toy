@@ -26,8 +26,8 @@ load_dotenv()
 ####################### input value ###########################
 id = os.environ.get("ID") #리움미술관 ID
 pw = os.environ.get("PW") #리움미술관 PW
-date_list = ['6','14'] #원하는 일자
-time_list = ['10','11','13','16','17']
+date_list = ['20','21'            ] #원하는 일자
+time_list = ['15','16']
 exhibit = 2 #원하는 전시회 (n번째)
 n_month = False # 다음달 조회여부
 ###############################################################
@@ -113,7 +113,7 @@ def search_time():
                     # time.sleep(3)
                     if n > 2: # 3
                         print('>>>>> 3매 예약')
-                        ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[4]')
+                        ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[3]')
                     elif n > 1: # 2매
                         print('>> 2매 예약')
                         ticket = driver.find_element(By.XPATH, f'//*[@id="peopleType01"]/label[3]')

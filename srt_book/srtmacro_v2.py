@@ -10,13 +10,13 @@ import os
 
 load_dotenv()
 
-id = os.environ.get("ID")
-pw = os.environ.get("PW")
-nm = os.environ.get("NAME")
-start = '김천구미'
+id = os.environ.get("ID1")
+pw = os.environ.get("PW1")
+nm = os.environ.get("NAME1")
+start = '통도사'
 end = '수서'
-yyyymmdd = '20230507'
-t = '12' # only 짝수
+yyyymmdd = '20230519'
+t = '14' # only 짝수
 num_trains_to_check=4
 want_reserve=False
 def open_browser():
@@ -62,8 +62,8 @@ def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm):
     driver.find_element(By.XPATH, "//input[@value='조회하기']").click() # 조회하기 버튼 클릭
     driver.implicitly_wait(5)
     time.sleep(1)
-    # bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
-    # bot.send_message(chat_id=-721609842, text=f"{nm}님의 {end}행/{t}시 이후 {num_trains_to_check}개의 SRT 조회를 시작합니다.")
+    bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
+    bot.send_message(chat_id=-721609842, text=f"{nm}님의 {end}행/{t}시 이후 {num_trains_to_check}개의 SRT 조회를 시작합니다.")
     while True:
         for i in range(1, num_trains_to_check+1):
             standard_seat = driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(7)").text
@@ -115,6 +115,6 @@ if __name__ == "__main__":
     # options.add_experimental_option("excludeSwitches", ["enable-logging"])
     # browser = webdriver.Chrome(options=options)
     browser = webdriver.Chrome()
-    driver = open_browser()
-    driver = login(driver, id, pw)
+    # driver = open_browser()
+    driver = login(browser, id, pw)
     search_train(driver, start, end, yyyymmdd, t) #기차 출발 시간은 반드시 짝수
