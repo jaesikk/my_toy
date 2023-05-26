@@ -14,9 +14,9 @@ def check():
     print(f'= = >> {cnt}회차 조회를 시작합니다.')
     driver.get(url)
     WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, '2023-05-21'))
+        EC.element_to_be_clickable((By.ID, '2023-05-27'))
     ).click()
-    print('2023-05-21 날짜 클릭')
+    print('2023-05-27 날짜 클릭')
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CLASS_NAME, 'c_ticket_seat'))
     ).click()
