@@ -45,8 +45,15 @@ def search_date():
     test = driver.find_element(By.XPATH,'//*[@id="calendar"]/div[1]/div[1]/div[2]/table/tbody/tr[3]/td[3]')
     print("<> > > > > > >testText :: ",test.text)
     # '//*[@id="calendar"]/div[1]/div[1]/div[2]/table/tbody/tr[3]/td[2]/span[4]'
-    time.sleep(3)
+
+
+    # '//*[@id="calendar"]/div[1]/div[1]/div[2]/table/tbody/tr[2]/td[4]'
+    for i in range(1,6):
+        date_btn = driver.find_element(By.XPATH,'//*[@id="calendar"]/div[1]/div[1]/div[2]/table/tbody/tr[i]/td[3]/span[1]/button').click()
+        print(date_btn)
+    time.sleep(3000)
     return driver
+
 if __name__ == "__main__":
     options = webdriver.ChromeOptions()
     options.headless = True
