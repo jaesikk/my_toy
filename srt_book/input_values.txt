@@ -1,0 +1,8 @@
+ID: 2092948424
+Password: !wotlr5414
+Name: 재식
+Start: 공주
+End: 동탄
+Date: 20230630
+Time: 18
+Number of trains to check: 3
