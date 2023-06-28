@@ -1,6 +1,6 @@
 ID: 2092948424
 Password: !wotlr5414
-Name: 재식
+Name: 종명
 Start: 공주
 End: 동탄
 Date: 20230630

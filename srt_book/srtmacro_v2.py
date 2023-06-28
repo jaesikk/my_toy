@@ -68,7 +68,7 @@ def main(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check):
     browser = webdriver.Chrome()
     # driver = open_browser()
     driver = login(browser, id, pw)
-    search_train(driver, start, end, yyyymmdd, t) #기차 출발 시간은 반드시 짝수
+    search_train(driver, start, end, yyyymmdd, t,nm,num_trains_to_check) #기차 출발 시간은 반드시 짝수
 
 def open_browser():
     driver = webdriver.Chrome("chromedriver")
@@ -86,8 +86,8 @@ def login(driver, login_id, login_psw):
     return driver
 
 ###################################################  num_trains_to_check : 조회리스트 사이즈, want_reserve : 예약대기 기능 활성화 여부
-def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm):
-    global num_trains_to_check, want_reserve
+def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm,nm,num_trains_to_check):
+    want_reserve=False
     is_booked = False # 예약 완료 되었는지 확인용
     cnt_refresh = 0 # 새로고침 회수 기록
 
@@ -115,9 +115,9 @@ def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm):
     driver.implicitly_wait(5)
     time.sleep(1)
     bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
-    bot.send_message(chat_id=-721609842, text=f"{nm}님의 {end}행/{t}시 이후 {num_trains_to_check}개의 SRT 조회를 시작합니다.")
+    bot.send_message(chat_id=-721609842, text=f"{nm}님의 {arr_stn}행/{dpt_tm}시 이후 {num_trains_to_check}개의 SRT 조회를 시작합니다.")
     while True:
-        for i in range(1, num_trains_to_check+1):
+        for i in range(1, int(num_trains_to_check)+1):
             standard_seat = driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(7)").text
             reservation = driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(8)").text
             # print('======================= log1 ============= > > > >>', standard_seat)
@@ -130,7 +130,7 @@ def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm):
                     is_booked = True
                     print("예약 성공")
                     bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
-                    bot.send_message(chat_id=-721609842, text=f"{nm}님의 {end}행 기차가 예약되었습니다 결제하세요")
+                    bot.send_message(chat_id=-721609842, text=f"{nm}님의 {arr_stn}행 기차가 예약되었습니다 결제하세요")
                     break
                 else:
                     print("잔여석 없음. 다시 검색")
@@ -143,7 +143,7 @@ def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm):
                     is_booked = True
                     print("예약 대기 완료")
                     bot = telegram.Bot(token='5949014838:AAEiIChMcVgFuCO3ZPr6AFhe03o2z745t-k')
-                    bot.send_message(chat_id="-721609842", text=f"{nm}님의 {end}행 기차 예약 대기가 신청되었습니다. 확인해주세요.")
+                    bot.send_message(chat_id="-721609842", text=f"{nm}님의 {arr_stn}행 기차 예약 대기가 신청되었습니다. 확인해주세요.")
                     break
 
         if not is_booked:
@@ -247,7 +247,6 @@ window.mainloop()
 # yyyymmdd = '20230519'
 # t = '14' # only 짝수
 # num_trains_to_check=4
-want_reserve=False
 
 ### ID, PW : SRT 계정
 ### 23행 search_train에서 세부 조정
