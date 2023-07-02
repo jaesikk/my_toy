@@ -11,7 +11,7 @@ import os
 import tkinter as tk
 
 # 입력값을 파일에 저장하는 함수
-def save_input_values(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check):
+def save_input_values(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check, passenger):
     with open("input_values.txt", "w") as file:
         file.write(f"ID: {id}\n")
         file.write(f"Password: {pw}\n")
@@ -20,7 +20,8 @@ def save_input_values(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check):
         file.write(f"End: {end}\n")
         file.write(f"Date: {yyyymmdd}\n")
         file.write(f"Time: {t}\n")
-        file.write(f"Number of trains to check: {num_trains_to_check}\n")
+        file.write(f"Number of trains to check: {num_trains_to_check}\n") #
+        file.write(f"passenger: {passenger}\n")
     print("Input values saved successfully.")
 
 # 파일에서 입력값을 읽어오는 함수
@@ -45,9 +46,10 @@ def submit_callback():
     yyyymmdd = yyyymmdd_entry.get()
     t = t_entry.get()
     num_trains_to_check = num_trains_to_check_entry.get()
+    passenger = passenger_entry.get()
 
     # 입력값 저장
-    save_input_values(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check)
+    save_input_values(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check, passenger)
 
     # 파일에서 입력값 읽어오기
     input_values = load_input_values()
@@ -62,13 +64,13 @@ def submit_callback():
     result_text.configure(state='disabled')
 
     #main 실행
-    main(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check)
+    main(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check, passenger)
 
-def main(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check):
+def main(id, pw, nm, start, end, yyyymmdd, t, num_trains_to_check, passenger):
     browser = webdriver.Chrome()
     # driver = open_browser()
     driver = login(browser, id, pw)
-    search_train(driver, start, end, yyyymmdd, t,nm,num_trains_to_check) #기차 출발 시간은 반드시 짝수
+    search_train(driver, start, end, yyyymmdd, t,nm,num_trains_to_check, passenger) #기차 출발 시간은 반드시 짝수
 
 def open_browser():
     driver = webdriver.Chrome("chromedriver")
@@ -86,7 +88,7 @@ def login(driver, login_id, login_psw):
     return driver
 
 ###################################################  num_trains_to_check : 조회리스트 사이즈, want_reserve : 예약대기 기능 활성화 여부
-def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm,nm,num_trains_to_check):
+def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm,nm,num_trains_to_check, passenger):
     want_reserve=False
     is_booked = False # 예약 완료 되었는지 확인용
     cnt_refresh = 0 # 새로고침 회수 기록
@@ -106,6 +108,10 @@ def search_train(driver, dpt_stn, arr_stn, dpt_dt, dpt_tm,nm,num_trains_to_check
     elm_dptTm = driver.find_element(By.ID, "dptTm")
     driver.execute_script("arguments[0].setAttribute('style','display: True;')", elm_dptTm)
     Select(driver.find_element(By.ID, "dptTm")).select_by_visible_text(dpt_tm) # 출발시간
+    print("passenger recv >>> ",passenger)
+    elm_passenger = driver.find_element(By.NAME, "psgInfoPerPrnb1")
+    driver.execute_script("arguments[0].setAttribute('style','display: True;')", elm_passenger)
+    Select(driver.find_element(By.NAME, "psgInfoPerPrnb1")).select_by_value(passenger)  # 출발날짜
 
     print("기차를 조회합니다")
     print(f"출발역:{dpt_stn} , 도착역:{arr_stn}\n날짜:{dpt_dt}, 시간: {dpt_tm}시 이후\n{num_trains_to_check}개의 기차 중 예약")
@@ -223,6 +229,13 @@ num_trains_to_check_label.pack()
 num_trains_to_check_entry = tk.Entry(window)
 num_trains_to_check_entry.insert(tk.END, input_values.get("Number of trains to check", ""))
 num_trains_to_check_entry.pack()
+
+# passenger 입력 필드
+passenger_label = tk.Label(window, text="passenger:")
+passenger_label.pack()
+passenger_entry = tk.Entry(window)
+passenger_entry.insert(tk.END, input_values.get("passenger", ""))
+passenger_entry.pack()
 
 # Submit 버튼
 submit_button = tk.Button(window, text="Submit", command=submit_callback)
